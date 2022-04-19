@@ -1,4 +1,4 @@
 package org.rasulov.paint;
 
-public class newApi {
+public class MasterNewApi {
 }
