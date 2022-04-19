@@ -1,3 +1,5 @@
 package org.rasulov.paint
 
-class Kot
+class Kot(){
+
+}
