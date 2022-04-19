@@ -13,5 +13,6 @@ class MainActivity : AppCompatActivity() {
         Log.d("it0088", "onCreate: ")
         Log.d("it0088", "onCreate: ")
         Log.d("it0088", "onCreate: ")
+        Log.d("it0088", "onCreate: ")
     }
 }
