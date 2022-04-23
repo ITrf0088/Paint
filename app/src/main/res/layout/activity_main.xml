@@ -4,13 +4,31 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <org.rasulov.paint.Drawing
-        android:id="@+id/drawing"
+    <androidx.cardview.widget.CardView
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_margin="5dp"
+        app:layout_constraintBottom_toTopOf="@id/img_btn_select_b_size"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent">
+
+        <org.rasulov.paint.drawingview.Drawing
+            android:id="@+id/drawing"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+             />
+    </androidx.cardview.widget.CardView>
+
+
+    <ImageButton
+        android:id="@+id/img_btn_select_b_size"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:scaleType="fitXY"
+        android:src="@drawable/ic_brush"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
