@@ -5,10 +5,11 @@
     android:layout_height="match_parent">
 
     <androidx.cardview.widget.CardView
+        android:id="@+id/cardView"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_margin="5dp"
-        app:layout_constraintBottom_toTopOf="@id/img_btn_select_b_size"
+        app:layout_constraintBottom_toTopOf="@+id/linear_setting"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -16,19 +17,75 @@
         <org.rasulov.paint.drawingview.Drawing
             android:id="@+id/drawing"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-             />
+            android:layout_height="match_parent" />
+
     </androidx.cardview.widget.CardView>
 
+    <LinearLayout
+        android:id="@+id/linear_setting"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:gravity="center"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toTopOf="@+id/linear_pallet"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
 
-    <ImageButton
-        android:id="@+id/img_btn_select_b_size"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:scaleType="fitXY"
-        android:src="@drawable/ic_brush"
+        <ImageButton
+            android:id="@+id/img_btn_select_b_size"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:scaleType="fitXY"
+            android:src="@drawable/ic_brush" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/linear_pallet"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:gravity="center"
+        android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent">
+
+        <TextView
+            style="@style/text_view_style"
+            android:tag="@color/yellow"
+
+            />
+
+        <TextView
+            style="@style/text_view_style"
+            android:tag="@color/red" />
+
+        <TextView
+            style="@style/text_view_style"
+            android:tag="@color/skin" />
+
+        <TextView
+            style="@style/text_view_style"
+            android:tag="@color/green" />
+
+        <TextView
+            style="@style/text_view_style"
+            android:tag="@color/blue" />
+
+        <TextView
+            style="@style/text_view_style"
+            android:tag="@color/black" />
+
+        <TextView
+            style="@style/text_view_style"
+            android:tag="@color/random" />
+
+        <TextView
+            style="@style/text_view_style"
+            android:tag="@color/lollipop" />
+
+    </LinearLayout>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
