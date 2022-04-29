@@ -2,6 +2,7 @@ package org.rasulov.paint.drawingview
 
 import android.content.Context
 import android.graphics.*
+import android.text.style.BackgroundColorSpan
 import android.util.AttributeSet
 import android.util.Log
 import android.util.TypedValue
@@ -12,16 +13,27 @@ class Drawing(context: Context, attrs: AttributeSet) : View(context, attrs) {
 
     private lateinit var bitmap: Bitmap
     private lateinit var bitmapCanvas: Canvas
-
-    var color: Int = Color.RED
-    private var thickness: Float = 0f
     private val bitmapPaint: Paint = Paint(Paint.DITHER_FLAG)
+
+    private var color: Int = Color.RED
+    private var thickness: Float = 0f
+
     private var pathPaint: PathPaint = PathPaint(color, thickness)
     private val pathPaints: ArrayList<PathPaint> = ArrayList()
 
     init {
         setBrushSize(5f)
     }
+
+    fun setColor(color: Color) {
+        this.color = Color.parseColor(color.toString())
+    }
+
+    fun setColor(color: Any?) {
+        this.color = Color.parseColor(color.toString())
+    }
+
+    fun getColor(): Int = color
 
     fun setBrushSize(brushSize: Float) {
         this.thickness = TypedValue.applyDimension(
@@ -31,22 +43,24 @@ class Drawing(context: Context, attrs: AttributeSet) : View(context, attrs) {
         )
     }
 
-    fun setPaintColor(color: Int) {
-        this.color = color
+    fun setBackground(background: Bitmap) {
+        bitmap = background
+        bitmapCanvas = Canvas(bitmap)
+        invalidate()
+
     }
 
+    fun undo() {
+        if (pathPaints.size > 0) {
+            pathPaints.removeAt(pathPaints.size - 1)
+            invalidate()
+        }
+    }
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
 
-        bitmapCanvas.drawColor(Color.WHITE)
-        for (p in pathPaints) {
-            val path = p.path
-            val paint = p.paint
-            bitmapCanvas.drawPath(path, paint)
-        }
-
-        canvas.drawBitmap(bitmap, 0f, 0f, bitmapPaint)
+        pathPaints.forEach { canvas.drawPath(it.path, it.paint) }
     }
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
@@ -75,4 +89,6 @@ class Drawing(context: Context, attrs: AttributeSet) : View(context, attrs) {
         bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
         bitmapCanvas = Canvas(bitmap)
     }
+
+
 }

@@ -5,7 +5,7 @@
     android:layout_height="match_parent">
 
     <androidx.cardview.widget.CardView
-        android:id="@+id/cardView"
+
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_margin="5dp"
@@ -14,10 +14,18 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <org.rasulov.paint.drawingview.Drawing
-            android:id="@+id/drawing"
+        <FrameLayout
+            android:id="@+id/frame"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent">
+
+            <org.rasulov.paint.drawingview.Drawing
+                android:id="@+id/drawing"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+        </FrameLayout>
+
 
     </androidx.cardview.widget.CardView>
 
@@ -33,9 +41,25 @@
         app:layout_constraintStart_toStartOf="parent">
 
         <ImageButton
+            android:id="@+id/img_btn_chooser_image"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_margin="5dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_gallery" />
+        <ImageButton
+            android:id="@+id/img_btn_undo"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_margin="5dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_undo" />
+
+        <ImageButton
             android:id="@+id/img_btn_select_b_size"
             android:layout_width="50dp"
             android:layout_height="50dp"
+            android:layout_margin="5dp"
             android:scaleType="fitXY"
             android:src="@drawable/ic_brush" />
     </LinearLayout>
