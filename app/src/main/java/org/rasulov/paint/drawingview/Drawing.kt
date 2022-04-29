@@ -2,6 +2,8 @@ package org.rasulov.paint.drawingview
 
 import android.content.Context
 import android.graphics.*
+import android.graphics.drawable.Drawable
+import android.graphics.drawable.VectorDrawable
 import android.text.style.BackgroundColorSpan
 import android.util.AttributeSet
 import android.util.Log
@@ -11,8 +13,6 @@ import android.view.View
 
 class Drawing(context: Context, attrs: AttributeSet) : View(context, attrs) {
 
-    private lateinit var bitmap: Bitmap
-    private lateinit var bitmapCanvas: Canvas
     private val bitmapPaint: Paint = Paint(Paint.DITHER_FLAG)
 
     private var color: Int = Color.RED
@@ -43,12 +43,6 @@ class Drawing(context: Context, attrs: AttributeSet) : View(context, attrs) {
         )
     }
 
-    fun setBackground(background: Bitmap) {
-        bitmap = background
-        bitmapCanvas = Canvas(bitmap)
-        invalidate()
-
-    }
 
     fun undo() {
         if (pathPaints.size > 0) {
@@ -84,11 +78,19 @@ class Drawing(context: Context, attrs: AttributeSet) : View(context, attrs) {
 
     }
 
-    override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
-        super.onSizeChanged(w, h, oldw, oldh)
-        bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
-        bitmapCanvas = Canvas(bitmap)
-    }
 
+    fun getDrawn(drawable: Drawable?): Bitmap {
+        val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+        val bitmapCanvas = Canvas(bitmap)
+        if (drawable != null) {
+            drawable.draw(bitmapCanvas)
+        } else {
+            bitmapCanvas.drawColor(Color.WHITE)
+        }
+        pathPaints.forEach {
+            bitmapCanvas.drawPath(it.path, it.paint)
+        }
+        return bitmap
+    }
 
 }
