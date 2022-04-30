@@ -90,6 +90,7 @@ class Drawing(context: Context, attrs: AttributeSet) : View(context, attrs) {
         pathPaints.forEach {
             bitmapCanvas.drawPath(it.path, it.paint)
         }
+
         return bitmap
     }
 

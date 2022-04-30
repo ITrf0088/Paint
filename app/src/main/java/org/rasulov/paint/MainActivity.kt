@@ -1,23 +1,29 @@
 package org.rasulov.paint
 
+import android.Manifest
 import android.app.Dialog
 import android.content.ContentValues
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
+import android.os.AsyncTask
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
+import android.util.Log
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageButton
 import android.widget.LinearLayout
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import androidx.core.app.DialogCompat
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toDrawable
@@ -26,12 +32,16 @@ import org.rasulov.paint.drawingview.Drawing
 import java.io.File
 import java.io.FileOutputStream
 import java.io.OutputStream
+import java.lang.Exception
+import kotlin.math.log
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var drawing: Drawing
     private lateinit var linearPallet: LinearLayout
     private lateinit var frame: FrameLayout
+    private lateinit var progressDialog: Dialog
+    private var task: Async? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -40,6 +50,7 @@ class MainActivity : AppCompatActivity() {
         drawing = findViewById(R.id.drawing)
         linearPallet = findViewById(R.id.linear_pallet)
         frame = findViewById(R.id.frame)
+        task = Async()
         val imgBtnSelectBrushSize = findViewById<ImageButton>(R.id.img_btn_select_b_size)
         val imgBtnImageChooser = findViewById<ImageButton>(R.id.img_btn_chooser_image)
         val imgBtnImageUndo = findViewById<ImageButton>(R.id.img_btn_undo)
@@ -106,16 +117,8 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    private fun showRationaleDialog() {
-        val dialog = AlertDialog.Builder(this)
-        dialog.setTitle("Permission request!")
-            .setMessage("Would you like to use an image from Gallery")
-            .setPositiveButton("Yes") { _, _ -> }
-            .setNegativeButton("No, thanks") { d, _ -> d.dismiss() }
-    }
 
     private fun save() {
-        val drawnAsBitmap = drawing.getDrawn(frame.background)
         var out: OutputStream? = null
 
         val filename = "${System.currentTimeMillis()}.png"
@@ -132,14 +135,70 @@ class MainActivity : AppCompatActivity() {
             out = insert?.let { contentResolver.openOutputStream(insert) }
 
         } else {
-            val imagesDir =
-                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
-            val image = File(imagesDir, filename)
-            out = FileOutputStream(image)
+            val checked =
+                ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+            if (checked == PackageManager.PERMISSION_GRANTED) {
+                val imagesDir =
+                    Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
+                val image = File(imagesDir, filename)
+                out = FileOutputStream(image)
+            } else {
+                requestWritePermission()
+            }
+        }
+        progressDialog = Dialog(this)
+        progressDialog.setContentView(R.layout.progressbar)
+        progressDialog.show()
+        task = Async()
+        task?.execute(out)
+
+    }
+
+    private fun requestWritePermission() {
+        val rationale = ActivityCompat.shouldShowRequestPermissionRationale(
+            this,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+        )
+
+        if (rationale) {
+            showRationaleDialog()
+        } else {
+            requestWrite.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        }
+    }
+
+    private fun showRationaleDialog() {
+        val dialog = AlertDialog.Builder(this)
+        dialog.setTitle("Permission request!")
+            .setMessage("it's needed the permission to save an image to Gallery.")
+            .setPositiveButton("Yes") { _, _ -> requestWrite.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE) }
+            .setNegativeButton("No, thanks") { d, _ -> d.dismiss() }
+        dialog.show()
+
+    }
+
+
+    inner class Async : AsyncTask<OutputStream, Unit, Boolean>() {
+
+
+        override fun doInBackground(vararg outs: OutputStream?): Boolean {
+            try {
+                outs[0]?.use {
+                    val drawnAsBitmap = drawing.getDrawn(frame.background)
+                    drawnAsBitmap.compress(Bitmap.CompressFormat.PNG, 90, it)
+                }
+            } catch (e: Exception) {
+                return false
+            }
+            return true
         }
 
-        out?.use {
-            drawnAsBitmap.compress(Bitmap.CompressFormat.PNG, 90, it)
+        override fun onPostExecute(result: Boolean?) {
+            super.onPostExecute(result)
+            progressDialog.dismiss()
+            var string = ""
+            string = if (result == true) "Successfully" else "Something went wrong!"
+            Toast.makeText(this@MainActivity, string, Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -155,6 +214,20 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+    private val requestWrite =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+            Log.d("it0088", "$granted: ")
+            if (granted) save()
+        }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        task?.let {
+            if (!it.isCancelled) {
+                it.cancel(true)
+            }
+        }
+    }
 }
 
 
