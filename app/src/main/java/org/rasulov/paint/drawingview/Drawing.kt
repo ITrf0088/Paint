@@ -10,10 +10,13 @@ import android.util.Log
 import android.util.TypedValue
 import android.view.MotionEvent
 import android.view.View
+import kotlin.math.abs
 
 class Drawing(context: Context, attrs: AttributeSet) : View(context, attrs) {
 
-    private val bitmapPaint: Paint = Paint(Paint.DITHER_FLAG)
+    private var oldX: Float = 0f
+    private var oldY: Float = 0f
+
 
     private var color: Int = Color.RED
     private var thickness: Float = 0f
@@ -67,15 +70,28 @@ class Drawing(context: Context, attrs: AttributeSet) : View(context, attrs) {
                 pathPaints.add(element)
                 pathPaint = element
                 pathPaint.path.moveTo(x, y)
-                pathPaint.path.lineTo(x, y)
+                oldX = x
+                oldY = y
             }
-            MotionEvent.ACTION_MOVE -> pathPaint.path.lineTo(x, y)
+            MotionEvent.ACTION_MOVE -> smoothLine(x, y)
+            MotionEvent.ACTION_UP -> pathPaint.path.lineTo(x, y)
             else -> return false
         }
 
         invalidate()
         return true
 
+    }
+
+    private fun smoothLine(x: Float, y: Float) {
+
+        val halfX = abs((oldX + x) / 2)
+        val halfY = abs((oldY + y) / 2)
+
+        pathPaint.path.quadTo(oldX, oldY, halfX, halfY)
+
+        oldX = x
+        oldY = y
     }
 
 
